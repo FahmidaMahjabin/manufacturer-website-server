@@ -3,7 +3,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 const cors = require("cors");
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 app.use(cors());
 app.use(express.json());
@@ -17,12 +17,23 @@ async function run(){
     const partsCollection = client.db("manufacturer-website").collection("manufacturer-parts");
     try{
     
-  // perform actions on the collection object
-    console.log("mongodb connected")
-    app.get("/purchase", async(req, res) =>{
-        res.send("This is purchase")
-    })
+// manufacturerParts e mongodb database theke find kore anbo  
+    app.get("/manufacturerParts", async(req, res) =>{
+        const cursor = partsCollection.find({});
+        const manufacturerParts = await cursor.toArray()
 
+        res.send(manufacturerParts)
+    })
+// ekta specific id er jonno data load korte hobe
+// step1:req er parameter theke id ta pabo oi id ta hobe query 
+// step2:oi id er object ta response pathabo 
+    app.get("/manufacturerParts/:id", async(req, res) =>{
+      const {id} = req.params;
+      console.log("id from backend:", id);
+      const filter = {_id: ObjectId(id)};
+      const item = await partsCollection.findOne(filter)
+      res.send(item)
+    })
     }
     finally{
 
