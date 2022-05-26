@@ -15,6 +15,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run(){
     await client.connect();
     const partsCollection = client.db("manufacturer-website").collection("manufacturer-parts");
+    const purchaseCollection = client.db("manufacturer-website").collection("manufacturer-purchase");
     try{
     
 // manufacturerParts e mongodb database theke find kore anbo  
@@ -34,6 +35,43 @@ async function run(){
       const item = await partsCollection.findOne(filter)
       res.send(item)
     })
+
+    // function = purchase page e item insert korbo 
+    // step1:req te jei object ta pathano hoise tar id ta diye search koro j database e ase kina
+    // na thakele insert korbo, thakle ager quantity er sathe new quantity add korbo
+    app.put("/purchase", async(req, res) =>{
+      const item = req.body;
+      
+      const {purchedId, purchedQuantity} = item;
+      const query = {purchedId: purchedId};
+      
+      console.log("query:", query)
+      
+      const existingItem =await purchaseCollection.findOne(query);
+      console.log("existingItem:", existingItem)
+      if (existingItem){
+        const quantity = parseInt(existingItem.purchedQuantity) + parseInt(purchedQuantity);
+        const updateDocument = {
+          $set:{
+            quantity : quantity
+          }
+        }
+        console.log("in if clause")
+        const result =await purchaseCollection.updateOne(query, updateDocument);
+        res.send(result)
+      }
+      else{
+        console.log("in else")
+        const result = await purchaseCollection.insertOne(item);
+        res.send(result);
+      }
+      
+      
+     
+      
+
+    })
+
     }
     finally{
 
