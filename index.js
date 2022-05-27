@@ -16,6 +16,7 @@ async function run(){
     await client.connect();
     const partsCollection = client.db("manufacturer-website").collection("manufacturer-parts");
     const purchaseCollection = client.db("manufacturer-website").collection("manufacturer-purchase");
+    const reviewCollection = client.db("manufacturer-website").collection("review")
     try{
     
 // manufacturerParts e mongodb database theke find kore anbo  
@@ -82,13 +83,27 @@ async function run(){
     // get myOrders for one invividual user 
     // step1:ekta email address er jonno kotopula purchase item ase ta pathabo
     app.get("/purchase", async(req, res) =>{
-      // const filter = req.query;
-      console.log("filter:", filter)
+      const filter = req.query;
+      // console.log("filter:", filter)
       const allPurchesed = await purchaseCollection.find(filter).toArray();
       res.send(allPurchesed)
 
     })
+    // add a review 
+    // step1:req body te jei data pabo ta insert korbo review collection e 
+    app.post("/review", async(req, res) =>{
+      const review = req.body;
+      console.log(review)
+      const listOfReview = await reviewCollection.insertOne(review);
+      res.send(listOfReview)
+    })
 
+    // show all reviews
+    app.get("/review", async(req, res) =>{
+      const cursor = reviewCollection.find({});
+      const allReviews = await cursor.toArray();
+      res.send(allReviews)
+    })
 
     }
     finally{
