@@ -16,7 +16,9 @@ async function run(){
     await client.connect();
     const partsCollection = client.db("manufacturer-website").collection("manufacturer-parts");
     const purchaseCollection = client.db("manufacturer-website").collection("manufacturer-purchase");
-    const reviewCollection = client.db("manufacturer-website").collection("review")
+    const reviewCollection = client.db("manufacturer-website").collection("review");
+    const myProfile = client.db("manufacturer-website").collection("myProfile")
+
     try{
     
 // manufacturerParts e mongodb database theke find kore anbo  
@@ -104,7 +106,19 @@ async function run(){
       const allReviews = await cursor.toArray();
       res.send(allReviews)
     })
+    // my profile data post that received from client
+    app.put("/myProfile", async(req, res) =>{
+      const addedInfo = req.body;
+      const option = { upsert: true };
+      const result = await myProfile.updateOne({}, {$set: addedInfo}, option);
+      res.send(result)
 
+    })
+    // get the profile
+    app.get("/myProfile", async(req, res) =>{
+      const result = await myProfile.find({}).toArray();
+      res.send(result)
+    })
     }
     finally{
 
