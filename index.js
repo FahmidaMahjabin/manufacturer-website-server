@@ -30,7 +30,6 @@ async function run(){
 // step2:oi id er object ta response pathabo 
     app.get("/manufacturerParts/:id", async(req, res) =>{
       const {id} = req.params;
-      console.log("id from backend:", id);
       const filter = {_id: ObjectId(id)};
       const item = await partsCollection.findOne(filter)
       res.send(item)
@@ -45,10 +44,16 @@ async function run(){
       const {purchedId, purchedQuantity} = item;
       const query = {purchedId: purchedId};
       
-      console.log("query:", query)
+      // console.log("query:", query)
       
       const existingItem =await purchaseCollection.findOne(query);
-      console.log("existingItem:", existingItem)
+      // console.log("existingItem:", existingItem)
+      const filerToGetStockItem = {_id: ObjectId(purchedId)};
+      const itemInStock = await partsCollection.findOne(filerToGetStockItem);
+      const remainingQuantity = itemInStock.quantity - parseInt(purchedQuantity);
+      console.log("remainingQuantity:",remainingQuantity);
+      // itemInStock.quantity = remainingQuantity;
+      let result;
       if (existingItem){
         const quantity = parseInt(existingItem.purchedQuantity) + parseInt(purchedQuantity);
         const updateDocument = {
@@ -57,20 +62,33 @@ async function run(){
           }
         }
         console.log("in if clause")
-        const result =await purchaseCollection.updateOne(query, updateDocument);
-        res.send(result)
+        result =await purchaseCollection.updateOne(query, updateDocument);
+        
       }
       else{
         console.log("in else")
-        const result = await purchaseCollection.insertOne(item);
-        res.send(result);
+        result = await purchaseCollection.insertOne(item);
+        
       }
-      
-      
-     
-      
+      const newQuantity = {
+        $set:{
+          quantity: remainingQuantity
+        }
+      }
+      const itemWithNewQuantity = await partsCollection.updateOne(filerToGetStockItem, newQuantity)
+      res.send(result)
+    })
+
+    // get myOrders for one invividual user 
+    // step1:ekta email address er jonno kotopula purchase item ase ta pathabo
+    app.get("/purchase", async(req, res) =>{
+      // const filter = req.query;
+      console.log("filter:", filter)
+      const allPurchesed = await purchaseCollection.find(filter).toArray();
+      res.send(allPurchesed)
 
     })
+
 
     }
     finally{
