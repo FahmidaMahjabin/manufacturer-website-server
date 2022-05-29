@@ -13,7 +13,7 @@ app.use(express.json());
 const uri = `mongodb+srv://${process.env.DB_username}:${process.env.DB_password}@cluster0.dfsqs.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 const verifyJWT = (req, res, next) =>{
-  console.log("in JWT")
+  // console.log("in JWT")
   const authHeader = req.headers.authorization;
   console.log("authHeader:", authHeader)
   if(!authHeader){
@@ -107,7 +107,7 @@ async function run(){
       const filter = req.query;
       const decodedEmail = req.decoded.email;
       console.log("decodedEmail:", decodedEmail)
-      if(filter === decodedEmail){
+      if(filter.buyer === decodedEmail){
         // console.log("filter:", filter)
         const allPurchesed = await purchaseCollection.find(filter).toArray();
         res.send(allPurchesed)
@@ -158,7 +158,7 @@ async function run(){
         
       }
       const result = await userCollection.updateOne(filter, updatedItem, option);
-      const token = jwt.sign({email: email}, process.env.ACCESS_TOKEN, { expiresIn: '1h' })
+      const token = jwt.sign({email: email}, process.env.ACCESS_TOKEN, { expiresIn: '1d' })
       res.send({result, token})
     })
     }
