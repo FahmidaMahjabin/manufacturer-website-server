@@ -14,12 +14,15 @@ const uri = `mongodb+srv://${process.env.DB_username}:${process.env.DB_password}
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 const verifyjwt = (req, res, next) =>{
   const authHeader = req.headers.authorization;
+  console.log("authHeader:", authHeader)
   if(!authHeader){
     return res.status(401).send({message: "unauthorized access"})
   }
   const token = authHeader.split(" ")[1];
   jwt.verify(token, process.env.ACCESS_TOKEN, function(err, decoded){
+
     if(err){
+      console.log("err:", err)
       return res.status(403).send({message:"forbidden access"})
     }
     req.decoded = decoded;
@@ -56,7 +59,7 @@ async function run(){
     // function = purchase page e item insert korbo 
     // step1:req te jei object ta pathano hoise tar id ta diye search koro j database e ase kina
     // na thakele insert korbo, thakle ager quantity er sathe new quantity add korbo
-    app.put("/purchase", async(req, res) =>{
+    app.put("/myOrders", async(req, res) =>{
       const item = req.body;
       
       const {purchedId, purchedQuantity} = item;
@@ -99,9 +102,10 @@ async function run(){
 
     // get myOrders for one invividual user 
     // step1:ekta email address er jonno kotopula purchase item ase ta pathabo
-    app.get("/purchase",verifyjwt, async(req, res) =>{
+    app.get("/myOrders",verifyjwt, async(req, res) =>{
       const filter = req.query;
       const decodedEmail = req.decoded.email;
+      console.log("decodedEmail:", decodedEmail)
       if(filter === decodedEmail){
         // console.log("filter:", filter)
         const allPurchesed = await purchaseCollection.find(filter).toArray();
