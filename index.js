@@ -57,6 +57,16 @@ async function run(){
       res.send(item)
     })
 
+    // delete one product
+    app.delete("/manufacturerParts", async(req, res) =>{
+      const id = req.body.id;
+      const query = {_id: ObjectId(id)};
+      const result = await partsCollection.deleteOne(query);
+      res.send(result)
+
+
+    })
+
     // function = purchase page e item insert korbo 
     // step1:req te jei object ta pathano hoise tar id ta diye search koro j database e ase kina
     // na thakele insert korbo, thakle ager quantity er sathe new quantity add korbo
