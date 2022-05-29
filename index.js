@@ -60,7 +60,9 @@ async function run(){
     // delete one product
     app.delete("/manufacturerParts", async(req, res) =>{
       const id = req.body.id;
+      console.log("id", id)
       const query = {_id: ObjectId(id)};
+      console.log("query:", query)
       const result = await partsCollection.deleteOne(query);
       res.send(result)
 
