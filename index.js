@@ -145,7 +145,11 @@ async function run(){
       const result = await myProfile.find({}).toArray();
       res.send(result)
     })
-
+    // get all user list
+    app.get("/user", async(req, res) =>{
+      const allUser = await userCollection.find({}).toArray();
+      res.send(allUser)
+    })
     // add user 
     app.put("/user/:email", async(req, res) =>{
       const email = req.params.email;
