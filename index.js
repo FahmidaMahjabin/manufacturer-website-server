@@ -58,16 +58,15 @@ async function run(){
     })
 
     // delete one product
-    app.delete("/manufacturerParts", async(req, res) =>{
-      const id = req.body.id;
-      console.log("id", id)
-      const query = {_id: ObjectId(id)};
-      console.log("query:", query)
-      const result = await partsCollection.deleteOne(query);
-      res.send(result)
-
-
-    })
+    app.delete("/manufacturerParts/:id", async(req, res) =>{
+      const {id} = req.params;
+      const filter = {_id: ObjectId(id)};
+      const deleteItem = await partsCollection.deleteOne(filter);
+      const cursor =  partsCollection.find({});
+      const resultant =await cursor.toArray();
+      // console.log("delete resultant:", resultant)
+      res.send(resultant) 
+  })
 
     // function = purchase page e item insert korbo 
     // step1:req te jei object ta pathano hoise tar id ta diye search koro j database e ase kina
