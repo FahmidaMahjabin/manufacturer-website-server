@@ -12,7 +12,8 @@ app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_username}:${process.env.DB_password}@cluster0.dfsqs.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
-const verifyjwt = (req, res, next) =>{
+const verifyJWT = (req, res, next) =>{
+  console.log("in JWT")
   const authHeader = req.headers.authorization;
   console.log("authHeader:", authHeader)
   if(!authHeader){
@@ -102,7 +103,7 @@ async function run(){
 
     // get myOrders for one invividual user 
     // step1:ekta email address er jonno kotopula purchase item ase ta pathabo
-    app.get("/myOrders",verifyjwt, async(req, res) =>{
+    app.get("/myOrders",verifyJWT, async(req, res) =>{
       const filter = req.query;
       const decodedEmail = req.decoded.email;
       console.log("decodedEmail:", decodedEmail)
