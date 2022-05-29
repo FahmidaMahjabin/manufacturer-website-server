@@ -151,15 +151,30 @@ async function run(){
       res.send(allUser)
     })
     // make a user admin
-    app.put("/user/admin/:email", async(req, res) =>{
+    app.put("/user/admin/:email",verifyJWT, async(req, res) =>{
       const email = req.params.email;
       console.log("email:", email);
       const filter = {email: email};
-      const roleAdmin = {
-        $set: {role: 'admin'}
-      };
-      const result = await userCollection.updateOne(filter, roleAdmin);
-      res.send(result)
+      const requester = req.decoded.email;
+      const requesterAccount = await userCollection.findOne({email: requester});
+      if (requesterAccount.role === "admin"){
+        const roleAdmin = {
+          $set: {role: 'admin'}
+        };
+        const result = await userCollection.updateOne(filter, roleAdmin);
+        res.send(result)
+      }
+      else(
+        res.status(403).send({message:"Forbidden"})
+      )
+      
+    })
+    // check if the role is admin
+    app.get("/admin/:email", async(req, res) =>{
+      const email = req.params.email;
+      const person = await userCollection.findOne({email:email});
+      const isAdmin = person.role === "admin";
+      res.send(isAdmin)
     })
     // add user 
     app.put("/user/:email", async(req, res) =>{
