@@ -150,6 +150,17 @@ async function run(){
       const allUser = await userCollection.find({}).toArray();
       res.send(allUser)
     })
+    // make a user admin
+    app.put("/user/admin/:email", async(req, res) =>{
+      const email = req.params.email;
+      console.log("email:", email);
+      const filter = {email: email};
+      const roleAdmin = {
+        $set: {role: 'admin'}
+      };
+      const result = await userCollection.updateOne(filter, roleAdmin);
+      res.send(result)
+    })
     // add user 
     app.put("/user/:email", async(req, res) =>{
       const email = req.params.email;
